@@ -345,27 +345,31 @@ do_build_payload([{Key, Value} | Params], Payload) ->
       do_build_payload(Params, [{atom_to_binary(Key, utf8), Value} | Payload]);
     #loc_alert{action = Action,
                args   = Args,
+               title  = Title,
                body   = Body,
                image  = Image,
                key    = LocKey} ->
-      Json = {case Body of
-                none -> [];
-                Body -> [{<<"body">>, unicode:characters_to_binary(Body)}]
-              end ++ case Action of
-                       none -> [];
-                       Action ->
-                        [{<<"action-loc-key">>,
-                          unicode:characters_to_binary(Action)}]
-                     end ++ case Image of
-                              none -> [];
-                              Image ->
-                                [{<<"launch-image">>,
-                                  unicode:characters_to_binary(Image)}]
-                            end ++
-                [{<<"loc-key">>, unicode:characters_to_binary(LocKey)},
-                 {<<"loc-args">>,
+      Json = {case Title of
+                  none -> [];
+                  Title -> [{<<"title">>, unicode:characters_to_binary(Title)}]
+              end ++ case Body of
+                         none -> [];
+                         Body -> [{<<"body">>, unicode:characters_to_binary(Body)}]
+                     end ++ case Action of
+                                none -> [];
+                                Action ->
+                                    [{<<"action-loc-key">>,
+                                      unicode:characters_to_binary(Action)}]
+                            end ++ case Image of
+                                       none -> [];
+                                       Image ->
+                                           [{<<"launch-image">>,
+                                             unicode:characters_to_binary(Image)}]
+                                   end ++
+                  [{<<"loc-key">>, unicode:characters_to_binary(LocKey)},
+                   {<<"loc-args">>,
                     lists:map(fun unicode:characters_to_binary/1, Args)}
-                ]},
+                  ]},
       do_build_payload(Params, [{atom_to_binary(Key, utf8), Json} | Payload]);
     _ ->
       do_build_payload(Params, Payload)
